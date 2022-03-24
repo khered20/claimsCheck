@@ -19,6 +19,8 @@ from urllib import request
 import sys
 import os
 
+import re
+
 # use your key here (Fact Check Tools API | Google Developers)
 key=''
 
@@ -59,7 +61,7 @@ if args.src == 'None' and args.pth == 'claims' and args.it == '50' and args.ps =
     print('~ps (optional) You can specify the pageSize for each rquest, default: -ps 10')
     print('~st (optional) You can specify the setTotal which will be saved in one file, default: -st 10')
     print('~npt (optional) You can specify nextPageToken, ex -npt CAo')
-    print('~getFData.py -src fullfact.org -pth datafolder -it 10000 -ps 500 -st 50')
+    print('~getFData.py -src fullfact.org -pth datafolder -it 1000 -ps 300 -st 50')
     
     
 
@@ -79,17 +81,16 @@ tag_body= args.b_mup
 class_body=args.b_class
 
 
-
+#imgLink='https://fullfact.org'
 #################################
-##### Test localy
+#### Test localy
 # iteration=1500
 # pageSize=300
 # setTotal=50
 # nextPageToken=''
-# claimsPath='fullfact/'
+# claimsPath='snopes/'
 # ensure_dir(claimsPath)
-# reviewPublisherSiteFilter='fullfact.org'
-# imgLink='https://fullfact.org'
+# reviewPublisherSiteFilter='snopes.com'
 # imgLink=reviewPublisherSiteFilter
 # filename = 'claims'
 # tag_body='None'
@@ -143,6 +144,10 @@ if tag_body == 'None' or class_body=='None':
 
 filename = reviewPublisherSiteFilter.split(".")[0]
 
+x = {
+  "link": [],
+  "img": []
+}
 
 i=0
 j=0
@@ -176,23 +181,24 @@ while i <iteration:
             soup = BeautifulSoup(html,'html.parser')
             #site_json=json.loads(soup.text)
             article = soup.find(tag_body, class_=class_body)
+            htmlarticle=article
             text_article=article.text
-            
+            #text_article=re.sub('\s+',' ',text_article)
             x = {
               "link": [],
               "img": []
             }
-            for link in article.find_all(['a','img']):
+            for link in htmlarticle.find_all(['a','img']):
                 #print(link)
-                if link.has_attr('href') and len(link['href']) < 5000:
+                if link.has_attr('href') and len(link['href']) < 500:
                     if 'http' not in link['href']:
                         x['link'].append(imgLink+link['href'])
                     else:
                         x['link'].append(link['href'])
                     #print(link['href'])
-                elif len(link['href']) > 5000:
+                elif len(link['href']) > 500:
                     article='TOO LONG LINK'
-                if link.has_attr('src')  and len(link['src']) < 5000:
+                if link.has_attr('src')  and len(link['src']) < 500:
                     if 'http' not in link['src']:
                         x['img'].append(imgLink+link['src'])
                     else:
@@ -205,8 +211,13 @@ while i <iteration:
             pass
         
         #duration=str(timedelta(seconds=duration))
-        if len(article)> 70000:
-            article='TOO LONG'
+        if article is not None:
+            if len(article)> 70000:
+                article='TOO LONG'
+            #else:
+                #article='deleted'
+        else:
+            article='None'
             
             
         raw_data = {

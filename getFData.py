@@ -184,13 +184,15 @@ while i <iteration:
             }
             for link in article.find_all(['a','img']):
                 #print(link)
-                if link.has_attr('href') and len(link['href']) < 10000:
+                if link.has_attr('href') and len(link['href']) < 5000:
                     if 'http' not in link['href']:
                         x['link'].append(imgLink+link['href'])
                     else:
                         x['link'].append(link['href'])
                     #print(link['href'])
-                if link.has_attr('src')  and len(link['src']) < 10000:
+                elif len(link['href']) > 5000:
+                    article='TOO LONG LINK'
+                if link.has_attr('src')  and len(link['src']) < 5000:
                     if 'http' not in link['src']:
                         x['img'].append(imgLink+link['src'])
                     else:
@@ -204,7 +206,7 @@ while i <iteration:
         
         #duration=str(timedelta(seconds=duration))
         if len(article)> 70000:
-            article='TOO LONG LINK'
+            article='TOO LONG'
             
             
         raw_data = {

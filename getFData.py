@@ -61,7 +61,7 @@ if args.src == 'None' and args.pth == 'claims' and args.it == '50' and args.ps =
     print('~ps (optional) You can specify the pageSize for each rquest, default: -ps 10')
     print('~st (optional) You can specify the setTotal which will be saved in one file, default: -st 10')
     print('~npt (optional) You can specify nextPageToken, ex -npt CAo')
-    print('~getFData.py -src fullfact.org -pth datafolder -it 1000 -ps 300 -st 50')
+    print('~getFData.py -src fullfact.org -pth datafolder -it 1500 -ps 300 -st 50')
     
     
 
@@ -83,7 +83,7 @@ class_body=args.b_class
 
 #imgLink='https://fullfact.org'
 #################################
-#### Test localy
+# #### Test localy
 # iteration=1500
 # pageSize=300
 # setTotal=50
@@ -232,13 +232,12 @@ while i <iteration:
                     'cR_reviewDate': [reviewDate],
                     'cR_textualRating': [textualRating],
                     'lCode': [languageCode],
-                    'html_article': [article],
+                    'links_article': [json.dumps(x)],
                     'text_article': [text_article],
-                    'links': [json.dumps(x)]
-                    
+                    'html_article': [article]
                     }
         df = pd.DataFrame(raw_data,columns = ['id','text','claimant','claimDate',
-          'cR_p_name','cR_p_site','cR_url','cR_title','cR_reviewDate','cR_textualRating','lCode','html_article','text_article','links'])
+          'cR_p_name','cR_p_site','cR_url','cR_title','cR_reviewDate','cR_textualRating','lCode','links_article','text_article','html_article'])
         
         evalpath= claimsPath+filename+'.csv'
         from os import path
@@ -251,7 +250,12 @@ while i <iteration:
             
         evaldata.to_csv(evalpath,index=False )
         
-        
+        x = {
+          "link": [],
+          "img": []
+        }
+        article=''
+        text_article=''
         
     nextPageToken =site_json['nextPageToken']
     
